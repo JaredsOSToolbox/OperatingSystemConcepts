@@ -6,9 +6,9 @@ all:
 clean:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
 
-test:
+test: all
 	sudo dmesg -C
-	sudo insmod lkm_example.ko
-	lsmod | grep “lkm_example”
-	sudo rmmod lkm_example
+	sudo insmod Hello_World.ko
+	lsmod | grep “Hello_World” && echo "yes" || echo "no"
+	sudo rmmod Hello_World
 	dmesg
