@@ -2,6 +2,8 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 
+// Sourced from here: https://blog.sourcerer.io/writing-a-simple-linux-kernel-module-d9dc3762c234
+
 MODULE_LICENSE(“GPL”);
 MODULE_AUTHOR(“Robert W. Oliver II”);
 
