@@ -1,40 +1,94 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
-#include <linux/types.h>
+#include <linux/list.h>
 #include <linux/slab.h>
 
-struct birthday {
+#define LICENSE "GPL"
+#define DESCRIPTION "McCarthy Assignment 0"
+#define AUTHOR "Jared Dyreson"
+/*
+ * Adapated from these two sources:
+ *
+ * https://stackoverflow.com/questions/16230524/explain-list-for-each-entry-and-list-for-each-entry-safe
+ * https://github.com/jz33/C-OS-Solution-Manual/blob/master/2_1.c
+ *
+ * I took one look at Kernel dev and said, "that's a no from me Chief"
+*/
+
+MODULE_LICENSE(LICENSE);
+MODULE_DESCRIPTION(DESCRIPTION);
+MODULE_AUTHOR(AUTHOR);
+
+struct birthday{
     int day;
-    int month;
-    int year;
     struct list_head list;
+};
+
+typedef struct birthday birthday;
+// instead of saying struct birthday birthday, just struct birthday
+
+struct birthday_container {
+    struct list_head list;
+    struct birthday birthday_;
+};
+
+// Initialize birthday list
+// Move to header file
+
+inline birthday* birthday_constructor(int d){
+    birthday* person = kmalloc(sizeof(birthday), GFP_KERNEL);
+    person->day = d;
+    INIT_LIST_HEAD(&person->list);
+    return person;
 }
 
-// Sourced from here: https://blog.sourcerer.io/writing-a-simple-linux-kernel-module-d9dc3762c234
+static LIST_HEAD(head);
 
-static LIST_HEAD(birthday_list);
+int linkedlist_init(void) {
+    // insert the elements into the list
+    // we're doing it in reverse order now so when it is retrieved it is in the correct order
 
-MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Jared Dyreson");
+    /*
+      head->e0->e1->e2->e3->e4->(head)
+    */
 
-MODULE_DESCRIPTION("A simple example Linux module.");
-MODULE_VERSION("0.01");
+    int i;
+    for(i = 5; i >= 0; --i){
+        birthday* bday = birthday_constructor(i);
+        if(i == 0) {
+            /*list_add_tail(&head, &bday->list);*/
+            list_add_tail(&bday->list, &head);
+        } else {
+            birthday *prev = list_first_entry(&head, struct birthday, list);
+            /*list_add_tail(&prev->list, &bday->list);*/
+            list_add_tail(&bday->list, &prev->list);
+        }
+        printk(KERN_INFO "[INFO] Inserting value of %d into the birthday list\n", i);
+    }
 
-static int __init lkm_example_init(void) {
-    printk(KERN_INFO "Hello, World!\n");
-	struct birthday *person;
-    person = kmalloc(sizeof(*person), GFP_KERNEL);
-    person->day = 2;
-    person->month= 8;
-    person->year = 1995;
-    INIT_LIST_HEAD(&person->list);
-    list_add_tail(&person->list, &birthday_list);
+    
+    birthday* pos;
+    birthday* n;
+    
+
     return 0;
 }
-static void __exit lkm_example_exit(void) {
-    printk(KERN_INFO "Goodbye, World!\n");
+
+void linkedlist_exit(void){  
+    birthday* pos;
+    birthday* n;
+
+    // think of this as a for loop, defined in /lib/modules/4.15.0-132-generic/build/include/linux/list.h:472
+
+    list_for_each_entry_safe(pos, n, &head, list) {
+        printk(KERN_INFO "[INFO] Removing value of %d from the list\n", pos->day);
+        list_del(&(pos->list));
+        kfree(pos);
+    }
+    printk(KERN_INFO "Removing Module Done\n");
 }
 
-module_init(lkm_example_init);
-module_exit(lkm_example_exit);
+module_init(linkedlist_init);
+module_exit(linkedlist_exit);
+ 
