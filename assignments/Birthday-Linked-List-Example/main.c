@@ -44,6 +44,14 @@ inline birthday* birthday_constructor(int d){
     return person;
 }
 
+void print_utsname(struct new_utsname* pointer){
+    printk(KERN_INFO
+        "System: %s\n
+         Nodename: %s\n",
+         pointer->sysname, pointer->nodename
+    );
+}
+
 static LIST_HEAD(head);
 
 int linkedlist_init(void) {
@@ -68,11 +76,6 @@ int linkedlist_init(void) {
         printk(KERN_INFO "[INFO] Inserting value of %d into the birthday list\n", i);
     }
 
-    
-    birthday* pos;
-    birthday* n;
-    
-
     return 0;
 }
 
@@ -88,7 +91,8 @@ void linkedlist_exit(void){
         kfree(pos);
     }
     struct new_utsname* information = utsname();
-    printk(KERN_INFO "Hey i got the current name of the system! %s\n", information->sysname);
+    print_utsname(&information);
+    /*printk(KERN_INFO "Hey i got the current name of the system! %s\n", information->sysname);*/
     printk(KERN_INFO "Removing Module Done\n");
 }
 
