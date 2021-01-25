@@ -1,4 +1,4 @@
-obj-m += someone_example.o
+obj-m += main.o
 
 all:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
@@ -8,7 +8,7 @@ clean:
 
 test: all
 	sudo dmesg -C
-	sudo insmod someone_example.ko
-	lsmod | grep “someone_example” && echo "yes" || echo "no"
-	sudo rmmod someone_example
+	sudo insmod main.ko
+	lsmod | grep “main” && echo "yes" || echo "no"
+	sudo rmmod main
 	dmesg

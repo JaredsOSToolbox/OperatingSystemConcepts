@@ -3,6 +3,7 @@
 #include <linux/kernel.h>
 #include <linux/list.h>
 #include <linux/slab.h>
+#include <linux/utsname.h>
 
 #define LICENSE "GPL"
 #define DESCRIPTION "McCarthy Assignment 0"
@@ -86,6 +87,8 @@ void linkedlist_exit(void){
         list_del(&(pos->list));
         kfree(pos);
     }
+    struct new_utsname* information = utsname();
+    printk(KERN_INFO "Hey i got the current name of the system! %s\n", information->sysname);
     printk(KERN_INFO "Removing Module Done\n");
 }
 
