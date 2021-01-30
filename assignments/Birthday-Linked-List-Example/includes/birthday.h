@@ -9,10 +9,3 @@ struct birthday {
 };
 
 typedef struct birthday birthday;
-
-inline birthday* birthday_constructor(){
-    birthday* person = kmalloc(sizeof(birthday), GFP_KERNEL);
-    person->day = d;
-    INIT_LIST_HEAD(&person->list);
-    return person;
-}
